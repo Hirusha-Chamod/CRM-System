@@ -1,106 +1,89 @@
-const User = require('../models/user');
-const bcryptjs = require('bcryptjs');
+const userService = require('../services/authService');
 const generateToken = require('../utils/generateToken');
-
 const signup = async (req, res) => {
     console.log("Signup function called");
     console.log("Request Body:", req.body); // Log the request body
+
+    const { email, password, name, profilePicture, role } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !name || !role) {
+        return res.status(400).json({ message: "Please fill all the fields" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email" });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+        return res.status(400).json({ message: "Password should be at least 6 characters" });
+    }
+
     try {
-        const { email, password, name, profilePicture, role } = req.body;
-
-        // Validate required fields
-        if (!email || !password || !name || !role) {
-            return res.status(400).json({ message: "Please fill all the fields" });
-        }
-
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: "Invalid email" });
-        }
-
-        // Validate password length
-        if (password.length < 6) {
-            return res.status(400).json({ message: "Password should be at least 6 characters" });
-        }
-
-        // Check for existing user by email
-        const existingUserByEmail = await User.findOne({ email: email });
-        if (existingUserByEmail) {
-            return res.status(400).json({ message: "User with this email already exists" });
-        }
-
-        // Hash password
-        const salt = await bcryptjs.genSalt(10);
-        const hashedPassword = await bcryptjs.hash(password, salt);
-
-        // Create new user
-        const newUser = new User({
+        // Call the service layer to register the user
+        const result = await userService.registerUser({
             email,
-            password: hashedPassword,
+            password,
             name,
             profilePicture,
             role
         });
 
-        await newUser.save();
+        // Generate token 
+        const token = generateToken(result.id);
 
-        // Generate token and set in response
-        generateToken(newUser._id, res);
-        res.status(201).json({ success: true, message: "User created successfully" });
-
+        res.status(201).json({
+            success: true,
+            message: "User created successfully",
+            user: result,
+            token: token
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        console.error("Signup error:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
     }
 };
 
 const login = async (req, res) => {
     console.log("Login function called");
 
+    const { email, password } = req.body;
+
+    // Validate required fields
+    if (!email || !password) {
+        return res.status(400).json({ message: "Please fill all the fields" });
+    }
+
     try {
-        const { email, password } = req.body;
+        // Call the service layer to login the user
+        const result = await userService.loginUser(email, password);
 
-        // Validate required fields
-        if (!email || !password) {
-            return res.status(400).json({ message: "Please fill all the fields" });
-        }
-
-        // Check if user exists by email
-        const user = await User.findOne({ email: email });
-        if (!user) {
-            return res.status(400).json({ message: "User with this email does not exist" });
-        }
-
-        // Compare provided password with hashed password
-        const isPasswordCorrect = await bcryptjs.compare(password, user.password);
-        if (!isPasswordCorrect) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        // Generate token and set in response
-        const token = generateToken(user._id, res);
-        const { password: _, ...userData } = user.toObject();
-
-        // Include user data and token in the response
-        res.status(200).json({ success: true, user: userData, token });
-
+        // Generate token and set it in response
+        res.status(200).json({
+            success: true,
+            user: result.user,
+            token: result.token
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        console.error("Login error:", error);
+        return res.status(400).json({ message: error.message });
     }
 };
 
-
-
 const logout = async (req, res) => {
     try {
-        res.clearCookie("jwt-edu");
-        res.status(200).json({ success: true, message: "Logged out successfully" })
+        res.status(200).json({ success: true, message: "Logged out successfully" });
     } catch (error) {
-        console.log("Error in logout controller", error.message)
+        console.log("Error in logout controller", error.message);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 async function authCheck(req, res) {
     try {

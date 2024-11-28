@@ -20,6 +20,51 @@ const createTicket = async (ticketData, userId) => {
     }
 }
 
+const getTicketById = async (id) => {
+    try {
+        const ticket = await ticketModel.getTicketById(id);
+        return ticket;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getAllTickets = async () => {
+    try {
+        const tickets = await ticketModel.getAllTickets();
+        return tickets;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const updateTicket = async (id, ticketData) => {
+    try {
+
+        const ticket = await ticketModel.updateTicket(id, ticketData);
+        return ticket;
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+const deleteTicket = async (id) => {
+    try {
+        const results = await ticketModel.deleteTicket(id);
+        return results;
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
 module.exports = {
-    createTicket
+    createTicket,
+    getTicketById,
+    updateTicket,
+    deleteTicket,
+    getAllTickets
 }

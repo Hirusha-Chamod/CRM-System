@@ -1,4 +1,4 @@
-const authService = require('../services/authService');
+const userService = require('../services/authService');
 
 const signup = async (req, res) => {
     console.log("Signup function called");
@@ -6,26 +6,42 @@ const signup = async (req, res) => {
 
     const { email, password, name, profilePicture, role } = req.body;
 
+    // Validate required fields
+    if (!email || !password || !name || !role) {
+        return res.status(400).json({ message: "Please fill all the fields" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email" });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+        return res.status(400).json({ message: "Password should be at least 6 characters" });
+    }
+
     try {
-        const result = await authService.registerUser({
+        const result = await userService.registerUser({
             email,
             password,
             name,
             profilePicture,
-            role,
+            role
         });
 
         res.status(201).json({
             success: true,
             message: "User created successfully",
             user: result.user,
-            token: result.token,
+            token: result.token
         });
     } catch (error) {
         console.error("Signup error:", error);
         return res.status(500).json({
             message: "Internal server error",
-            error: error.message,
+            error: error.message
         });
     }
 };
@@ -35,17 +51,18 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
+
     if (!email || !password) {
         return res.status(400).json({ message: "Please fill all the fields" });
     }
 
     try {
-        const result = await authService.loginUser(email, password);
+        const result = await userService.loginUser(email, password);
 
         res.status(200).json({
             success: true,
             user: result.user,
-            token: result.token,
+            token: result.token
         });
     } catch (error) {
         console.error("Login error:", error);
@@ -57,7 +74,7 @@ const logout = async (req, res) => {
     try {
         res.status(200).json({ success: true, message: "Logged out successfully" });
     } catch (error) {
-        console.error("Error in logout controller", error.message);
+        console.log("Error in logout controller", error.message);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -67,7 +84,7 @@ async function authCheck(req, res) {
         console.log("req.user:", req.user);
         res.status(200).json({ success: true, user: req.user, token: req.token });
     } catch (error) {
-        console.error("Error in authCheck controller", error.message);
+        console.log("Error in authCheck controller", error.message);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 }

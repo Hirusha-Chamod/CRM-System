@@ -1,53 +1,102 @@
 const bcrypt = require('bcrypt');
+const db = require('../config/db');
 const generateToken = require('../utils/generateToken');
 const userModel = require('../models/user');
 
-// Service function to register a user
 const registerUser = async (userData) => {
-    try {
-        // Hash password before saving
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-        // Prepare user data with hashed password
-        const newUserData = {
-            ...userData,
-            password: hashedPassword
-        };
-
-        // Call the model's createUser function to save user in database
-        return await userModel.createUser(newUserData);
-    } catch (error) {
-        throw error;
+    const validationErrors = userModel.validate(userData);
+    if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join(', '));
     }
+
+    return new Promise((resolve, reject) => {
+        const checkUserQuery = 'SELECT * FROM users WHERE email = ?';
+
+        db.query(checkUserQuery, [userData.email], async (checkErr, existingUsers) => {
+            if (checkErr) {
+                return reject(checkErr);
+            }
+
+            if (existingUsers.length > 0) {
+                return reject(new Error('User with this email already exists'));
+            }
+
+            try {
+                const hashedPassword = await bcrypt.hash(userData.password, 10);
+                const { name, email, profile_picture, role } = userData;
+
+                const insertQuery = `
+                    INSERT INTO users (name, email, password, profile_picture, role, created_at) 
+                    VALUES (?, ?, ?, ?, ?, NOW())
+                `;
+
+                db.query(
+                    insertQuery,
+                    [name, email, hashedPassword, profile_picture || null, role || 'user'],
+                    (insertErr, result) => {
+                        if (insertErr) {
+                            return reject(insertErr);
+                        }
+
+                        const getUserQuery = 'SELECT * FROM users WHERE id = ?';
+                        db.query(getUserQuery, [result.insertId], (getUserErr, users) => {
+                            if (getUserErr) {
+                                return reject(getUserErr);
+                            }
+
+                            const sanitizedUser = userModel.sanitize(users[0]);
+                            const token = generateToken(sanitizedUser.id);
+                            resolve({ 
+                                user: sanitizedUser, 
+                                token 
+                            });
+                        });
+                    }
+                );
+            } catch (hashError) {
+                reject(hashError);
+            }
+        });
+    });
 };
 
-// Service function to login a user
 const loginUser = async (email, password) => {
-    try {
-        // Get user by email
-        const user = await userModel.getUserByEmail(email);
-        
-        if (!user) {
-            throw new Error('User not found');
-        }
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM users WHERE email = ?';
 
-        // Compare provided password with the stored hash
-        const isMatch = await bcrypt.compare(password, user.password);
-        
-        if (!isMatch) {
-            throw new Error('Invalid credentials');
-        }
+        db.query(query, [email], async (err, users) => {
+            if (err) {
+                return reject(err);
+            }
 
-        // Create JWT token if credentials are correct
-        const token = generateToken(user.id); // Note: changed from _id to id
-        
-        return { token, user };
-    } catch (error) {
-        throw error;
-    }
+            if (users.length === 0) {
+                return reject(new Error('User not found'));
+            }
+
+            const user = users[0];
+
+            try {
+                const isMatch = await bcrypt.compare(password, user.password);
+
+                if (!isMatch) {
+                    return reject(new Error('Invalid credentials'));
+                }
+
+                const token = generateToken(user.id);
+                const sanitizedUser = userModel.sanitize(user);
+
+                resolve({ 
+                    token, 
+                    user: sanitizedUser 
+                });
+            } catch (compareError) {
+                reject(compareError);
+            }
+        });
+    });
 };
 
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
 };

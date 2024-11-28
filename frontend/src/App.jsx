@@ -3,9 +3,9 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { authCheck } from './features/user';
 import Login from './pages/Auth/Login';
-import AdminRoutes from './views/Admin';
-import UserRoutes from './views/Users';
 import Sidebar from './components/Dashboard';
+import CreateUsers from './pages/Admin/CreateUsers';
+import AllUsers from './pages/Admin/AllUsers';
 
 function App() {
   const dispatch = useDispatch();
@@ -27,7 +27,6 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  // Render routes based on the user role (admin or other)
   return (
     <Routes>
       <Route
@@ -36,9 +35,13 @@ function App() {
           user?.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/users" />
         ) : <Navigate to="/login" />}
       />
-      {/* Admin and User routes */}
-      <Route path="/admin/*" element={<AdminRoutes />} />
-      <Route path="/users/*" element={<UserRoutes />} />
+      {/* Admin and User routes with Sidebar */}
+      <Route path="/admin/*" element={<Sidebar role="admin" />}>
+        <Route path="createUser" element={<CreateUsers />} />
+        <Route path="allUsers" element={<AllUsers />} />
+      </Route>
+
+      <Route path="/users/*" element={<Sidebar role={user?.role} />} />
 
       {/* Login route */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />

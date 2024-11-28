@@ -11,27 +11,27 @@ import {
 } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 
-const Sidebar = ({ userType, onLogout }) => {
+const Sidebar = ({ role }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   // Sidebar menu items based on user type
   const getSidebarItems = () => {
-    switch (userType) {
+    switch (role) {
       case 'admin':
         return [
-          { icon: <Home />, label: 'Dashboard', link: '/dashboard' },
+          { icon: <Home />, label: 'Dashboard', link: '/admin' },
           { icon: <Users />, label: 'User Management', link: '/admin/allUsers' },
-          { icon: <Users />, label: 'User Management', link: '/admin/createUser' },
+          { icon: <Users />, label: 'Create New Account', link: '/admin/createUser' },
           { icon: <Settings />, label: 'System Settings', link: '/settings' }
         ];
-      case 'Financial Planner':
+      case 'financial_planner':
         return [
           { icon: <Home />, label: 'Dashboard', link: '/dashboard' },
           { icon: <Ticket />, label: 'Create Ticket', link: '/create-ticket' },
           { icon: <FileText />, label: 'My Tickets', link: '/my-tickets' },
           { icon: <User />, label: 'Client Management', link: '/clients' }
         ];
-      case 'Mortgage Broker':
+      case 'mortgage_broker':
         return [
           { icon: <Home />, label: 'Dashboard', link: '/dashboard' },
           { icon: <Ticket />, label: 'Received Tickets', link: '/received-tickets' },
@@ -127,7 +127,7 @@ const Sidebar = ({ userType, onLogout }) => {
         {/* Logout Section */}
         <div className="border-t p-4">
           <button
-            onClick={onLogout}
+            // onClick={onLogout}
             className="
             w-full 
             flex items-center 
@@ -143,9 +143,10 @@ const Sidebar = ({ userType, onLogout }) => {
             {isExpanded && <span className="text-sm">Logout</span>}
           </button>
         </div>
-        <div className="flex-1 p-4">
-          <Outlet /> {/* This is where the nested route will render */}
-        </div>
+
+      </div>
+      <div className="flex-1 p-4">
+        <Outlet />
       </div>
     </div>
   );

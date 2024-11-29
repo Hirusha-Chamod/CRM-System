@@ -34,16 +34,16 @@ export const signupUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('http://localhost:5000/api/auth/signup', userData);
-            return data; 
+            return data;
         } catch (error) {
-            
+
             if (error.response) {
                 if (error.response.status === 409) {
-                    alert(error.response.data.message); 
+                    alert(error.response.data.message);
                 }
             }
             console.error('Signup Error:', error);
-            return rejectWithValue(error.response ? error.response.data : error.message); 
+            return rejectWithValue(error.response ? error.response.data : error.message);
         }
     }
 );
@@ -128,8 +128,8 @@ const userSlice = createSlice({
         });
         builder.addCase(signupUser.fulfilled, (state, { payload }) => {
             state.loading = false;
-            state.user = payload;
-            state.isAuthenticated = true;
+            state.user = null;
+            state.isAuthenticated = false;
         });
         builder.addCase(signupUser.rejected, (state, { payload }) => {
             state.loading = false;

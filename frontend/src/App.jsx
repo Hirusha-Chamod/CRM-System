@@ -10,6 +10,7 @@ import CreateTicket from './pages/Users/CreateTicket';
 import MyTickets from './pages/Users/MyTickets';
 import ReceivedTickets from './pages/Users/ReceivedTickets';
 import Homepage from './pages/HomePage';
+import AdminRegister from './pages/Admin/AdminRegister';
 
 function App() {
   const dispatch = useDispatch();
@@ -41,8 +42,10 @@ function App() {
         ) : <Navigate to="/login" />}
       />
 
+
       <Route path="/admin/*" element={<Sidebar role="Admin" />}>
         <Route path="" element={<Homepage />} />
+
         <Route path="createUser" element={<CreateUsers />} />
         <Route path="allUsers" element={<AllUsers />} />
       </Route>
@@ -58,6 +61,7 @@ function App() {
         path="/login"
         element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
       />
+      <Route path='admin/register' element={<AdminRegister />} />
     </Routes>
   );
 }

@@ -6,6 +6,10 @@ import Login from './pages/Auth/Login';
 import Sidebar from './components/Dashboard';
 import CreateUsers from './pages/Admin/CreateUsers';
 import AllUsers from './pages/Admin/AllUsers';
+import CreateTicket from './pages/Users/CreateTicket';
+import MyTickets from './pages/Users/MyTickets';
+import ReceivedTickets from './pages/Users/ReceivedTickets';
+import Homepage from './pages/HomePage';
 
 function App() {
   const dispatch = useDispatch();
@@ -32,19 +36,28 @@ function App() {
       <Route
         path="/"
         element={isAuthenticated ? (
-          user?.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/users" />
+          user?.role === 'Admin' ? <Navigate to="/admin" /> : <Navigate to="/users" />
         ) : <Navigate to="/login" />}
       />
+
       {/* Admin and User routes with Sidebar */}
-      <Route path="/admin/*" element={<Sidebar role="admin" />}>
+      <Route path="/admin/*" element={<Sidebar role="Admin" />}>
+        <Route path="home" element={<Homepage />} />
         <Route path="createUser" element={<CreateUsers />} />
         <Route path="allUsers" element={<AllUsers />} />
       </Route>
 
-      <Route path="/users/*" element={<Sidebar role={user?.role} />} />
+      <Route path="/users/*" element={<Sidebar role={user?.role} />} >
+        <Route path="home" element={<Homepage />} />
+        <Route path="createTicket" element={<CreateTicket />} />
+        <Route path="myTickets" element={<MyTickets />} />
+        <Route path="receivedTickets" element={<ReceivedTickets />} />
+      </Route>
 
-      {/* Login route */}
-      <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+      <Route
+        path="/login"
+        element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
+      />
     </Routes>
   );
 }

@@ -166,9 +166,9 @@ const CreateUsers = () => {
                                 } shadow-sm p-2`}
                         >
                             <option value="">Select a role</option>
-                            <option value="admin">Admin</option>
-                            <option value="financial_planner">Financial Planner</option>
-                            <option value="mortgage_broker">Mortgage Broker</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Financial Planner">Financial Planner</option>
+                            <option value="Mortgage Broker">Mortgage Broker</option>
                         </select>
                         {errors.role && (
                             <p className="text-red-500 text-xs mt-1">{errors.role}</p>

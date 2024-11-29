@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getAuthHeader } from '../utils/getToken';
 
-// Initial state
+
 const initialState = {
     user: null,
     isAuthenticated: false,
@@ -11,12 +11,10 @@ const initialState = {
     users: [],
 };
 
-// Utility for extracting error messages
 const handleApiError = (error) => {
     return error.response?.data?.message || error.message || 'An error occurred';
 };
 
-// Async Thunks
 export const loginUser = createAsyncThunk(
     'user/login',
     async (credentials, { rejectWithValue }) => {
@@ -59,23 +57,6 @@ export const logoutUser = createAsyncThunk(
 );
 
 
-
-
-export const updateUser = createAsyncThunk(
-    'user/update',
-    async ({ id, userData }, { rejectWithValue }) => {
-        try {
-            const config = getAuthHeader();
-            const { data } = await axios.put(`http://localhost:5000/api/users/${id}`, userData, config);
-            return data;
-        } catch (error) {
-            console.error('Update User Error:', error);
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-
 export const authCheck = createAsyncThunk(
     'user/authCheck',
     async (_, { rejectWithValue }) => {
@@ -90,7 +71,7 @@ export const authCheck = createAsyncThunk(
     }
 );
 
-// Slice
+
 const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -100,7 +81,7 @@ const userSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // Login
+
         builder
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
@@ -116,7 +97,7 @@ const userSlice = createSlice({
                 state.error = payload;
             });
 
-        // Auth Check
+
         builder
             .addCase(authCheck.pending, (state) => {
                 state.loading = true;
@@ -155,22 +136,10 @@ const userSlice = createSlice({
             state.user = null;
             state.isAuthenticated = false;
             state.error = null;
+            localStorage.removeItem('jwtToken');
         });
 
-        
-        // Update User
-        builder.addCase(updateUser.fulfilled, (state, { payload }) => {
-            const index = state.users.findIndex((user) => user.id === payload.id);
-            if (index !== -1) {
-                state.users[index] = payload;
-            }
-            if (state.user?.id === payload.id) {
-                state.user = payload;
-            }
-        });
     },
 });
-
-// Export actions and reducer
 export const { clearError } = userSlice.actions;
 export default userSlice.reducer;

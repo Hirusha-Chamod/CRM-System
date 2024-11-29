@@ -1,8 +1,9 @@
 export const getAuthHeader = () => {
     const token = localStorage.getItem('jwtToken');
-
-    if (token) {
-        return { headers: { Authorization: `Bearer ${token}` } };
-    }
-    return {};
+    return {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    };
 };

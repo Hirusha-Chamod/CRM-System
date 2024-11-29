@@ -9,33 +9,39 @@ import {
   User,
   CreditCard
 } from 'lucide-react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom'; // Import Link
+import { logoutUser } from '../features/user';
+import { useDispatch } from 'react-redux';
 
 const Sidebar = ({ role }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Sidebar menu items based on user type
   const getSidebarItems = () => {
+    console.log(role)
     switch (role) {
-      case 'admin':
+      case 'Admin':
         return [
-          { icon: <Home />, label: 'Dashboard', link: '/admin' },
+          { icon: <Home />, label: 'Dashboard', link: '/admin/home' },
           { icon: <Users />, label: 'User Management', link: '/admin/allUsers' },
           { icon: <Users />, label: 'Create New Account', link: '/admin/createUser' },
           { icon: <Settings />, label: 'System Settings', link: '/settings' }
         ];
-      case 'financial_planner':
+      case 'Financial Planner':
         return [
-          { icon: <Home />, label: 'Dashboard', link: '/dashboard' },
-          { icon: <Ticket />, label: 'Create Ticket', link: '/create-ticket' },
-          { icon: <FileText />, label: 'My Tickets', link: '/my-tickets' },
-          { icon: <User />, label: 'Client Management', link: '/clients' }
+          { icon: <Home />, label: 'Dashboard', link: '/users/home' },
+          { icon: <Ticket />, label: 'Create Ticket', link: '/users/createTicket' },
+          { icon: <FileText />, label: 'My Tickets', link: '/users/myTickets' },
+          { icon: <Ticket />, label: 'Received Tickets', link: '/users/receivedTickets' },
         ];
-      case 'mortgage_broker':
+      case 'Mortgage Broker':
         return [
-          { icon: <Home />, label: 'Dashboard', link: '/dashboard' },
-          { icon: <Ticket />, label: 'Received Tickets', link: '/received-tickets' },
-          { icon: <CreditCard />, label: 'Mortgage Analysis', link: '/mortgage-analysis' }
+          { icon: <Home />, label: 'Dashboard', link: '/users/home' },
+          { icon: <Ticket />, label: 'Create Ticket', link: '/users/createTicket' },
+          { icon: <FileText />, label: 'My Tickets', link: '/users/myTickets' },
+          { icon: <Ticket />, label: 'Received Tickets', link: '/users/receivedTickets' },
         ];
       default:
         return [];
@@ -43,6 +49,17 @@ const Sidebar = ({ role }) => {
   };
 
   const sidebarItems = getSidebarItems();
+
+  const onLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap(); // Wait for logout to complete
+      navigate('/login'); // Navigate after successful logout
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Optionally handle logout error (show message, etc.)
+    }
+  };
+
 
   return (
     <div className="flex">
@@ -96,15 +113,10 @@ const Sidebar = ({ role }) => {
             {sidebarItems.map((item, index) => (
               <li
                 key={index}
-                className="
-                hover:bg-gray-100 
-                transition-colors 
-                duration-200 
-                cursor-pointer
-              "
+                className="hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
               >
-                <a
-                  href={item.link}
+                <Link
+                  to={item.link} // Use Link for navigation
                   className="
                   flex items-center 
                   p-4 
@@ -118,7 +130,7 @@ const Sidebar = ({ role }) => {
                       {item.label}
                     </span>
                   )}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -127,7 +139,7 @@ const Sidebar = ({ role }) => {
         {/* Logout Section */}
         <div className="border-t p-4">
           <button
-            // onClick={onLogout}
+            onClick={onLogout}
             className="
             w-full 
             flex items-center 
@@ -143,7 +155,6 @@ const Sidebar = ({ role }) => {
             {isExpanded && <span className="text-sm">Logout</span>}
           </button>
         </div>
-
       </div>
       <div className="flex-1 p-4">
         <Outlet />

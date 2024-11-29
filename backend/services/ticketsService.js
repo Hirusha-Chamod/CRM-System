@@ -10,7 +10,7 @@ const createTicket = async (ticketData, userId) => {
             ...ticketData,
             serial_number: serialNumber,
             created_by: userId,
-            current_owner: userId
+            assigned_to: userId
         }
 
         const results = await ticketModel.createTicket(completeTicket);
@@ -28,6 +28,17 @@ const getTicketById = async (id) => {
         console.log(error);
     }
 }
+
+const getTicketByUser = async (id) => {
+    try {
+        const tickets = await ticketModel.getTicketByUser(id);
+        return tickets;
+    } catch (error) {
+        console.error("Error in ticket service:", error);
+        throw new Error("Error retrieving tickets");
+    }
+};
+
 
 const getAllTickets = async () => {
     try {
@@ -66,5 +77,6 @@ module.exports = {
     getTicketById,
     updateTicket,
     deleteTicket,
-    getAllTickets
+    getAllTickets,
+    getTicketByUser
 }

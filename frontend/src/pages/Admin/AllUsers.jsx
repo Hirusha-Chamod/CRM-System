@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Table } from 'antd';
+import { Button, Modal, Table, Form, Input, Select, notification } from 'antd';
 import axios from 'axios';
+import { Trash2, Edit } from 'lucide-react';
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [userIdToDelete, setUserIdToDelete] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [form] = Form.useForm();
 
   const fetchUsers = async () => {
     try {
@@ -23,31 +25,57 @@ const AllUsers = () => {
   }, []);
 
   const handleDelete = (userId) => {
-    setUserIdToDelete(userId);
-    setIsModalVisible(true);
+    Modal.confirm({
+      title: 'Are you sure you want to delete this user?',
+      content: 'Once deleted, this action cannot be undone.',
+      onOk: async () => {
+        try {
+          await axios.delete(`http://localhost:5000/api/users/${userId}`);
+          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+        } catch (error) {
+          setDeleteErrorMessage('Cannot delete user. They may have an ongoing ticket.');
+        }
+      },
+      okText: 'Yes, delete it',
+      cancelText: 'No, cancel',
+    });
   };
 
-  const confirmDelete = async () => {
-    if (userIdToDelete) {
-      try {
-        await axios.delete(`http://localhost:5000/api/users/${userIdToDelete}`);
-        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userIdToDelete));
-        setIsModalVisible(false);
-      } catch (error) {
-        setDeleteErrorMessage('Cannot delete user. They may have an ongoing ticket.');
-      }
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    form.setFieldsValue({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      password: '',
+    });
+    setIsEditModalVisible(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/users/${selectedUser.id}`, form.getFieldsValue());
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === selectedUser.id ? { ...user, ...form.getFieldsValue() } : user
+        )
+      );
+      setIsEditModalVisible(false);
+      setSelectedUser(null);
+      notification.success({
+        message: 'Success',
+        description: 'User updated successfully.',
+        duration: 3,
+      });
+    } catch (error) {
+      setErrorMessage('Error updating user');
     }
-  };
-
-  const cancelDelete = () => {
-    setIsModalVisible(false);
   };
 
   const handleErrorModalClose = () => {
     setErrorMessage(null);
     setDeleteErrorMessage(null);
   };
-
 
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
@@ -59,9 +87,18 @@ const AllUsers = () => {
       title: 'Action',
       key: 'action',
       render: (text, record) => (
-        <Button onClick={() => handleDelete(record.id)} type="danger">
-          Delete
-        </Button>
+        <div className="flex justify-center space-x-2">
+          <Button
+            onClick={() => handleEdit(record)}
+            icon={<Edit size={20} />}
+            title="Edit User"
+            type="link"
+          />
+          <Button onClick={() => handleDelete(record.id)} icon={<Trash2 size={20} />}
+            title="Delete User"
+            type="link"
+            danger />
+        </div>
       ),
     },
   ];
@@ -79,24 +116,73 @@ const AllUsers = () => {
         </Modal>
       )}
 
+      {deleteErrorMessage && (
+        <Modal
+          title="Error Deleting"
+          visible={true}
+          onOk={handleErrorModalClose}
+          onCancel={handleErrorModalClose}
+        >
+          <p>{deleteErrorMessage}</p>
+        </Modal>
+      )}
+
+
+      <Modal
+        title="Edit User"
+        visible={isEditModalVisible}
+        onOk={handleUpdate}
+        onCancel={() => setIsEditModalVisible(false)}
+        okText="Update"
+        cancelText="Cancel"
+      >
+        <Form
+          form={form}
+          layout="vertical"
+        >
+          <Form.Item
+            label="Full Name"
+            name="name"
+            rules={[{ required: true, message: 'Please input the user name!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: 'Please input the user email!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Role"
+            name="role"
+            rules={[{ required: true, message: 'Please select a user role!' }]}
+          >
+            <Select>
+              <Select.Option value="admin">Admin</Select.Option>
+              <Select.Option value="financial_planner">Financial Planner</Select.Option>
+              <Select.Option value="mortgage_broker">Mortgage Broker</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: false, message: 'Please input the user password!' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+
       <Table
         dataSource={users}
         columns={columns}
         rowKey="id"
       />
-
-      <Modal
-        title="Are you sure?"
-        visible={isModalVisible}
-        onOk={confirmDelete}
-        onCancel={cancelDelete}
-      >
-        {deleteErrorMessage ? (
-          <p>{deleteErrorMessage}</p>
-        ) : (
-          <p>Do you want to delete this user?</p>
-        )}
-      </Modal>
     </div>
   );
 };

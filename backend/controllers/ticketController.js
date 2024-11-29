@@ -60,6 +60,44 @@ const getTicketById = async (req, res) => {
 
     }
 }
+const getTicketByUser = async (req, res) => {
+    try {
+        // // Validate user context
+        // if (!req.user || !req.user.id) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Invalid user context"
+        //     });
+        // }
+
+        const userId = req.params.id;
+
+        const tickets = await ticketService.getTicketByUser(userId);
+
+        if (!tickets || tickets.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No tickets found for this user."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Tickets retrieved successfully",
+            tickets
+        });
+    } catch (error) {
+        console.error(`Error fetching tickets for user ${req.user?.id}:`, error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
+
+
 
 const getAllTickets = async (req, res) => {
     try {
@@ -128,5 +166,6 @@ module.exports = {
     getTicketById,
     getAllTickets,
     updateTicket,
-    deleteTicket
+    deleteTicket,
+    getTicketByUser
 }

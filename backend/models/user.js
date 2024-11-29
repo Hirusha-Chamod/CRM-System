@@ -61,6 +61,7 @@ const getAllUsers = () => {
     });
 };
 
+
 const deleteUser = (userId) => {
     const query = 'DELETE FROM users WHERE id = ?';
 

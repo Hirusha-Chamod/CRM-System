@@ -32,7 +32,7 @@ const deleteUser = async (req, res) => {
     }
 
     try {
-        await userService.deleteUser(userId);  
+        await userService.deleteUser(userId);
         res.status(200).json({
             message: "User deleted successfully"
         });
@@ -60,8 +60,25 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const user = await userService.getUserById(id);
+        res.status(200).json({
+            message: "User retrieved successfully",
+            user: user
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Error fetching user",
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
     updateUser,
     deleteUser,
-    getAllUsers
+    getAllUsers,
+    getUserById
 };

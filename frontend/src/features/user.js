@@ -34,10 +34,16 @@ export const signupUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('http://localhost:5000/api/auth/signup', userData);
-            return data;
+            return data; 
         } catch (error) {
+            
+            if (error.response) {
+                if (error.response.status === 409) {
+                    alert(error.response.data.message); 
+                }
+            }
             console.error('Signup Error:', error);
-            return rejectWithValue(handleApiError(error));
+            return rejectWithValue(error.response ? error.response.data : error.message); 
         }
     }
 );
@@ -47,7 +53,7 @@ export const logoutUser = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             await axios.post('http://localhost:5000/api/auth/logout');
-            localStorage.removeItem('jwtToken'); // Clear JWT
+            localStorage.removeItem('jwtToken');
             return null;
         } catch (error) {
             console.error('Logout Error:', error);

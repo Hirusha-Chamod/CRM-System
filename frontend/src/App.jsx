@@ -13,13 +13,14 @@ import Homepage from './pages/HomePage';
 
 function App() {
   const dispatch = useDispatch();
+  const { user, isAuthenticated = false, loading = false } = useSelector((state) => state.user || {});
 
   useEffect(() => {
     console.log('Dispatching authCheck...');
     dispatch(authCheck());
   }, [dispatch]);
 
-  const { user, isAuthenticated = false, loading = false } = useSelector((state) => state.user || {});
+
 
   useEffect(() => {
     console.log('User:', user);
@@ -40,15 +41,14 @@ function App() {
         ) : <Navigate to="/login" />}
       />
 
-      {/* Admin and User routes with Sidebar */}
       <Route path="/admin/*" element={<Sidebar role="Admin" />}>
-        <Route path="home" element={<Homepage />} />
+        <Route path="" element={<Homepage />} />
         <Route path="createUser" element={<CreateUsers />} />
         <Route path="allUsers" element={<AllUsers />} />
       </Route>
 
       <Route path="/users/*" element={<Sidebar role={user?.role} />} >
-        <Route path="home" element={<Homepage />} />
+        <Route path="" element={<Homepage />} />
         <Route path="createTicket" element={<CreateTicket />} />
         <Route path="myTickets" element={<MyTickets />} />
         <Route path="receivedTickets" element={<ReceivedTickets />} />

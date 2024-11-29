@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserPlus } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { signupUser } from '../../features/user';
+import { notification } from 'antd';
+
 
 const CreateUsers = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const dispatch = useDispatch()
+    const { loading, error } = useSelector((state) => state.user);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -14,10 +19,15 @@ const CreateUsers = () => {
         role: ''
     });
 
-
     const [errors, setErrors] = useState({});
+    const [submitError, setSubmitError] = useState(null);
 
-    // Handle input changes
+    useEffect(() => {
+        if (submitError) {
+            setSubmitError(null);
+        }
+    }, [formData]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -26,16 +36,13 @@ const CreateUsers = () => {
         }));
     };
 
-    // Form validation
     const validateForm = () => {
         const newErrors = {};
 
-        // Name validation
         if (!formData.name.trim()) {
             newErrors.name = 'Name is required';
         }
 
-        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
@@ -43,14 +50,12 @@ const CreateUsers = () => {
             newErrors.email = 'Invalid email format';
         }
 
-        // Password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
             newErrors.password = 'Password must be at least 8 characters';
         }
 
-        // Role validation
         if (!formData.role) {
             newErrors.role = 'Please select a user role';
         }
@@ -59,12 +64,11 @@ const CreateUsers = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError(null);
 
         if (validateForm()) {
-            // Prepare data for submission
             const userData = {
                 name: formData.name,
                 email: formData.email,
@@ -72,15 +76,26 @@ const CreateUsers = () => {
                 role: formData.role
             };
 
+            try {
+                const result = await dispatch(signupUser(userData)).unwrap();
 
-            dispatch(signupUser(userData));
-            // Reset form after submission
-            setFormData({
-                name: '',
-                email: '',
-                password: '',
-                role: ''
-            });
+                setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    role: ''
+                });
+                notification.success({
+                    message: 'Success',
+                    description: 'User Created successfully.',
+                    duration: 3,
+                });
+                navigate('/admin');
+            } catch (err) {
+                const errorMessage = err || 'An unexpected error occurred';
+                setSubmitError(errorMessage);
+                console.error('User creation error:', errorMessage);
+            }
         }
     };
 
@@ -91,8 +106,16 @@ const CreateUsers = () => {
                     <UserPlus className="mr-3" /> Create New User
                 </h2>
 
+                {(loading || submitError) && (
+                    <div className={`mb-4 p-3 rounded ${loading
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-red-100 text-red-700'
+                        }`}>
+                        {loading ? 'Processing...' : submitError}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Name Input */}
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                             Full Name
@@ -103,8 +126,7 @@ const CreateUsers = () => {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className={`mt-1 block w-full rounded-md border ${errors.name ? 'border-red-500' : 'border-gray-300'
-                                } shadow-sm p-2`}
+                            className={`mt-1 block w-full rounded-md border ${errors.name ? 'border-red-500' : 'border-gray-300'} shadow-sm p-2`}
                             placeholder="Enter full name"
                         />
                         {errors.name && (
@@ -112,7 +134,6 @@ const CreateUsers = () => {
                         )}
                     </div>
 
-                    {/* Email Input */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email Address
@@ -123,8 +144,7 @@ const CreateUsers = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className={`mt-1 block w-full rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'
-                                } shadow-sm p-2`}
+                            className={`mt-1 block w-full rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'} shadow-sm p-2`}
                             placeholder="Enter email address"
                         />
                         {errors.email && (
@@ -132,7 +152,6 @@ const CreateUsers = () => {
                         )}
                     </div>
 
-                    {/* Password Input */}
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             Password
@@ -143,8 +162,7 @@ const CreateUsers = () => {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className={`mt-1 block w-full rounded-md border ${errors.password ? 'border-red-500' : 'border-gray-300'
-                                } shadow-sm p-2`}
+                            className={`mt-1 block w-full rounded-md border ${errors.password ? 'border-red-500' : 'border-gray-300'} shadow-sm p-2`}
                             placeholder="Create a strong password"
                         />
                         {errors.password && (
@@ -152,7 +170,6 @@ const CreateUsers = () => {
                         )}
                     </div>
 
-                    {/* Role Selection */}
                     <div>
                         <label htmlFor="role" className="block text-sm font-medium text-gray-700">
                             User Role
@@ -162,8 +179,7 @@ const CreateUsers = () => {
                             name="role"
                             value={formData.role}
                             onChange={handleChange}
-                            className={`mt-1 block w-full rounded-md border ${errors.role ? 'border-red-500' : 'border-gray-300'
-                                } shadow-sm p-2`}
+                            className={`mt-1 block w-full rounded-md border ${errors.role ? 'border-red-500' : 'border-gray-300'} shadow-sm p-2`}
                         >
                             <option value="">Select a role</option>
                             <option value="Admin">Admin</option>
@@ -175,13 +191,16 @@ const CreateUsers = () => {
                         )}
                     </div>
 
-                    {/* Submit Button */}
                     <div className="pt-4">
                         <button
                             type="submit"
-                            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300"
+                            disabled={loading}
+                            className={`w-full text-white py-2 rounded-md transition duration-300 ${loading
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-sky-700 hover:bg-sky-900'
+                                }`}
                         >
-                            Create User
+                            {loading ? 'Creating User...' : 'Create User'}
                         </button>
                     </div>
                 </form>

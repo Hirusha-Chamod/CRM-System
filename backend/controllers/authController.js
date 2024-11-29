@@ -39,6 +39,10 @@ const signup = async (req, res) => {
         });
     } catch (error) {
         console.error("Signup error:", error);
+
+        if (error.code === 'ER_DUP_ENTRY' || error.message.includes('Duplicate entry')) {
+            return res.status(409).json({ message: "This email is already registered" });
+        }
         return res.status(500).json({
             message: "Internal server error",
             error: error.message

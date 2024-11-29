@@ -32,6 +32,11 @@ const AllUsers = () => {
         try {
           await axios.delete(`http://localhost:5000/api/users/${userId}`);
           setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+          notification.success({
+            message: 'Success',
+            description: 'User deleted successfully.',
+            duration: 3,
+          });
         } catch (error) {
           setDeleteErrorMessage('Cannot delete user. They may have an ongoing ticket.');
         }
@@ -90,7 +95,8 @@ const AllUsers = () => {
         <div className="flex justify-center space-x-2">
           <Button
             onClick={() => handleEdit(record)}
-            icon={<Edit size={20} />}
+            icon={<Edit size={20} color="#0284c7" />}
+
             title="Edit User"
             type="link"
           />
@@ -135,6 +141,12 @@ const AllUsers = () => {
         onCancel={() => setIsEditModalVisible(false)}
         okText="Update"
         cancelText="Cancel"
+        okButtonProps={{
+          className: 'bg-sky-700 hover:bg-sky-900 text-white'
+        }}
+        cancelButtonProps={{
+          className: 'bg-gray-200 hover:bg-gray-300 text-black'
+        }}
       >
         <Form
           form={form}
@@ -170,7 +182,7 @@ const AllUsers = () => {
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: false, message: 'Please input the user password!' }]}
+            rules={[{ required: true, message: 'Please input the user password!' }]}
           >
             <Input.Password />
           </Form.Item>
@@ -182,6 +194,7 @@ const AllUsers = () => {
         dataSource={users}
         columns={columns}
         rowKey="id"
+        pagination={5}
       />
     </div>
   );

@@ -11,6 +11,7 @@ const ReceivedTickets = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [creatorName, setCreatorName] = useState('');
+    const [createrRole, setCreaterRole] = useState('');
 
     useEffect(() => {
         if (user?.id) {
@@ -18,7 +19,8 @@ const ReceivedTickets = () => {
         }
     }, [user?.id, fetchTickets]);
 
-    const filteredTickets = tickets.filter((ticket) => ticket.assigned_to === user.id);
+    const filteredTickets = tickets.filter((ticket) => ticket.assigned_to === user.id && ticket.status !== 'NotAssigned');
+
 
 
 
@@ -26,6 +28,7 @@ const ReceivedTickets = () => {
         try {
             const response = await axios.get(`http://localhost:5000/api/users/${creatorId}`);
             setCreatorName(response.data.user.name);
+            setCreaterRole(response.data.user.role);
         } catch (error) {
             console.error('Error fetching creator name:', error);
         }
@@ -80,6 +83,11 @@ const ReceivedTickets = () => {
             dataIndex: 'amount',
             key: 'amount',
             render: (text) => <span>{text}</span>,
+        }, {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text) => <span>{text}</span>,
         },
         {
             title: 'Actions',
@@ -109,7 +117,7 @@ const ReceivedTickets = () => {
                 <Table
                     columns={columns}
                     dataSource={filteredTickets}
-                    rowKey="key"  // Use the newly added 'key' property
+                    rowKey="key"
                     pagination={false}
                     size="middle"
                 />
@@ -127,7 +135,7 @@ const ReceivedTickets = () => {
                         <p><strong>Client Name:</strong> {selectedTicket.client_name}</p>
                         <p><strong>Amount:</strong> {selectedTicket.amount}</p>
                         <p><strong>Status:</strong> {selectedTicket.status}</p>
-                        <p><strong>Created By:</strong> {creatorName || 'Loading...'}</p> {/* Show creator's name */}
+                        <p><strong>Created By:</strong> {creatorName || 'Loading...'}({createrRole || 'Loading'})</p>
 
                         <div className="flex justify-end space-x-2 mt-4">
                             <Button

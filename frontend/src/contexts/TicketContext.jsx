@@ -1,13 +1,9 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import axios from 'axios';
 
-// Create the TicketContext
+
 const TicketContext = createContext();
 
-// Custom hook to use TicketContext
-export const useTicket = () => {
-    return useContext(TicketContext);
-};
 
 export const TicketProvider = ({ children }) => {
     const [tickets, setTickets] = useState([]);
@@ -57,15 +53,7 @@ export const TicketProvider = ({ children }) => {
         setError(null);
 
         try {
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            };
-
-            const response = await axios.put(`http://localhost:5000/api/tickets/${updatedTicket.id}`, updatedTicket, config);
+            const response = await axios.put(`http://localhost:5000/api/tickets/${updatedTicket.id}`, updatedTicket);
             console.log("Updated ticket:", response.data);
             setTickets(prevTickets =>
                 prevTickets.map(ticket =>
@@ -93,4 +81,8 @@ export const TicketProvider = ({ children }) => {
             {children}
         </TicketContext.Provider>
     );
+};
+
+export const useTicket = () => {
+    return useContext(TicketContext);
 };

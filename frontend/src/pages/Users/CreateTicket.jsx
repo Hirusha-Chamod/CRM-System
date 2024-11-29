@@ -3,6 +3,7 @@ import { TicketPlus } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { getAuthHeader } from '../../utils/getToken';
 import axios from 'axios';
+import { notification } from 'antd';
 
 const CreateTicket = () => {
 
@@ -16,7 +17,6 @@ const CreateTicket = () => {
 
     const [errors, setErrors] = useState({});
 
-    // Handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -25,24 +25,28 @@ const CreateTicket = () => {
         }));
     };
 
-    // Form validation
     const validateForm = () => {
         const newErrors = {};
 
+        // Validate client name
         if (!formData.client_name.trim()) {
             newErrors.client_name = 'Client name is required';
         }
 
+        // Validate client address
         if (!formData.client_address.trim()) {
             newErrors.client_address = 'Client address is required';
         }
 
-
+        // Validate contact details 
+        const phoneRegex = /^[0-9]{10}$/;
         if (!formData.client_contact_details.trim()) {
             newErrors.client_contact_details = 'Contact details are required';
+        } else if (!phoneRegex.test(formData.client_contact_details)) {
+            newErrors.client_contact_details = 'Please enter a valid phone number';
         }
 
-
+        // Validate amount
         if (!formData.amount) {
             newErrors.amount = 'Amount is required';
         } else if (isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0) {
@@ -73,10 +77,12 @@ const CreateTicket = () => {
 
                 if (response.data) {
                     console.log('Ticket created successfully');
-                    // Optionally, show a success message or reset form
+                    notification.success({
+                        message: 'Success',
+                        description: 'Ticket created successfully.',
+                        duration: 3
+                    })
                 }
-
-                // Reset form after submission
                 setFormData({
                     client_name: '',
                     client_address: '',
@@ -85,7 +91,6 @@ const CreateTicket = () => {
                 });
             } catch (error) {
                 console.error('Error creating ticket:', error.response ? error.response.data : error.message);
-                // Optionally, show an error message to the user
             }
         }
     };
@@ -175,28 +180,10 @@ const CreateTicket = () => {
                             <p className="text-red-500 text-xs mt-1">{errors.amount}</p>
                         )}
                     </div>
-
-
-                    <div>
-                        <label htmlFor="route_to" className="block text-sm font-medium text-gray-700">
-                            Route Ticket To
-                        </label>
-                        <select
-                            id="route_to"
-                            name="route_to"
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                        >
-                            <option value="">Select a user to route ticket</option>
-                            <option value="financial_planner">Financial Planner</option>
-                            <option value="mortgage_broker">Mortgage Broker</option>
-                        </select>
-                    </div>
-
-                    {/* Submit Button */}
                     <div className="pt-4">
                         <button
                             type="submit"
-                            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300"
+                            className="w-full bg-sky-700 hover:bg-sky-900 text-white py-2 rounded-md transition duration-300"
                         >
                             Create Ticket
                         </button>

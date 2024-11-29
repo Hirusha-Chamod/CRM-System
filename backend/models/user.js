@@ -9,7 +9,6 @@ const createUser = (userData) => {
             if (err) {
                 reject(err);
             } else {
-                // Important: resolve with the inserted user's details or ID
                 resolve({ id: result.insertId, email, name, profile_picture, role });
             }
         });

@@ -48,7 +48,7 @@ const AllUsers = () => {
     });
   };
 
- 
+
   //Populate edit modal with user data
   const handleEdit = (user) => {
     setSelectedUser(user);
@@ -61,7 +61,7 @@ const AllUsers = () => {
     setIsEditModalVisible(true);
   };
 
-   //Update a user
+  //Update a user
   const handleUpdate = async () => {
     try {
       await axios.put(`http://localhost:5000/api/users/${selectedUser.id}`, form.getFieldsValue());
@@ -181,9 +181,9 @@ const AllUsers = () => {
             rules={[{ required: true, message: 'Please select a user role!' }]}
           >
             <Select>
-              <Select.Option value="admin">Admin</Select.Option>
-              <Select.Option value="financial_planner">Financial Planner</Select.Option>
-              <Select.Option value="mortgage_broker">Mortgage Broker</Select.Option>
+              <Select.Option value="Admin">Admin</Select.Option>
+              <Select.Option value="Financial Planner">Financial Planner</Select.Option>
+              <Select.Option value="Mortgage Broker">Mortgage Broker</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item

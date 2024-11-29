@@ -11,6 +11,7 @@ const AllUsers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [form] = Form.useForm();
 
+  //Fetch all users
   const fetchUsers = async () => {
     try {
       const { data } = await axios.get('http://localhost:5000/api/users');
@@ -24,6 +25,7 @@ const AllUsers = () => {
     fetchUsers();
   }, []);
 
+  //Delete a user
   const handleDelete = (userId) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this user?',
@@ -46,6 +48,8 @@ const AllUsers = () => {
     });
   };
 
+ 
+  //Populate edit modal with user data
   const handleEdit = (user) => {
     setSelectedUser(user);
     form.setFieldsValue({
@@ -57,6 +61,7 @@ const AllUsers = () => {
     setIsEditModalVisible(true);
   };
 
+   //Update a user
   const handleUpdate = async () => {
     try {
       await axios.put(`http://localhost:5000/api/users/${selectedUser.id}`, form.getFieldsValue());
@@ -77,11 +82,13 @@ const AllUsers = () => {
     }
   };
 
+
   const handleErrorModalClose = () => {
     setErrorMessage(null);
     setDeleteErrorMessage(null);
   };
 
+  //Table columns
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Name', dataIndex: 'name', key: 'name' },
@@ -133,7 +140,7 @@ const AllUsers = () => {
         </Modal>
       )}
 
-
+      {/* Edit User Modal */}
       <Modal
         title="Edit User"
         visible={isEditModalVisible}
@@ -188,7 +195,6 @@ const AllUsers = () => {
           </Form.Item>
         </Form>
       </Modal>
-
 
       <Table
         dataSource={users}

@@ -12,6 +12,7 @@ const CreateUsers = () => {
 
     const { loading, error } = useSelector((state) => state.user);
 
+    // Initialize form data state
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -19,9 +20,12 @@ const CreateUsers = () => {
         role: ''
     });
 
+    //Error states
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState(null);
 
+
+     // Effect to reset submit error when it changes
     useEffect(() => {
         if (submitError) {
             setSubmitError(null);
@@ -36,6 +40,7 @@ const CreateUsers = () => {
         }));
     };
 
+    //Validate form
     const validateForm = () => {
         const newErrors = {};
 
@@ -64,6 +69,7 @@ const CreateUsers = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    //Create a user
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitError(null);

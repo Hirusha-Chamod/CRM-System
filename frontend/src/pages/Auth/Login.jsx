@@ -5,12 +5,14 @@ import { Mail, Lock } from 'lucide-react';
 import { loginUser } from '../../features/user';
 
 const Login = () => {
+    //Initialize state
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const dispatch = useDispatch();
 
+    //Login user
     const login = async (e) => {
         e.preventDefault();
         setIsLoading(true);

@@ -1,6 +1,8 @@
 const ticketModel = require('../models/ticket');
 const { generateTicketSerialNumber } = require('../utils/generateTicketSerialNumber');
 
+
+//Create a new ticket
 const createTicket = async (ticketData, userId) => {
     try {
 
@@ -20,6 +22,7 @@ const createTicket = async (ticketData, userId) => {
     }
 }
 
+//Get a ticket by id
 const getTicketById = async (id) => {
     try {
         const ticket = await ticketModel.getTicketById(id);
@@ -29,6 +32,7 @@ const getTicketById = async (id) => {
     }
 }
 
+//Get a ticket by user ID
 const getTicketByUser = async (id) => {
     try {
         const tickets = await ticketModel.getTicketByUser(id);
@@ -39,7 +43,7 @@ const getTicketByUser = async (id) => {
     }
 };
 
-
+//Get all tickets
 const getAllTickets = async () => {
     try {
         const tickets = await ticketModel.getAllTickets();
@@ -49,6 +53,7 @@ const getAllTickets = async () => {
     }
 }
 
+//Update a ticket
 const updateTicket = async (id, ticketData) => {
     try {
 
@@ -61,6 +66,7 @@ const updateTicket = async (id, ticketData) => {
     }
 }
 
+//Delete a ticket
 const deleteTicket = async (id) => {
     try {
         const results = await ticketModel.deleteTicket(id);

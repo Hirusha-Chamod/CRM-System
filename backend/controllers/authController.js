@@ -1,5 +1,6 @@
 const userService = require('../services/authService');
 
+// Signup controller
 const signup = async (req, res) => {
     console.log("Signup function called");
     console.log("Request Body:", req.body);
@@ -31,6 +32,7 @@ const signup = async (req, res) => {
             role
         });
 
+        // Send Success response
         res.status(201).json({
             success: true,
             message: "User created successfully",
@@ -50,6 +52,7 @@ const signup = async (req, res) => {
     }
 };
 
+// Login controller
 const login = async (req, res) => {
     console.log("Login function called");
 
@@ -74,6 +77,7 @@ const login = async (req, res) => {
     }
 };
 
+// Logout controller
 const logout = async (req, res) => {
     try {
         res.status(200).json({ success: true, message: "Logged out successfully" });
@@ -83,6 +87,7 @@ const logout = async (req, res) => {
     }
 };
 
+// Auth check controller
 async function authCheck(req, res) {
     try {
         console.log("req.user:", req.user);

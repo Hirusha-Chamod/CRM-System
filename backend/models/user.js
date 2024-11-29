@@ -1,5 +1,6 @@
 const db = require('../config/db');
 
+// Create a new user
 const createUser = (userData) => {
     const { email, password, name, profile_picture, role } = userData;
     const query = 'INSERT INTO users (email, password, name, profile_picture, role) VALUES (?,?,?,?,?)';
@@ -15,6 +16,7 @@ const createUser = (userData) => {
     });
 };
 
+// Get a user by email
 const getUserByEmail = (email) => {
     const query = 'SELECT * FROM users WHERE email = ?';
 
@@ -29,6 +31,7 @@ const getUserByEmail = (email) => {
     });
 };
 
+// Get a user by id
 const getUserById = (id) => {
     const query = 'SELECT * FROM users WHERE id = ?';
 
@@ -46,6 +49,7 @@ const getUserById = (id) => {
     });
 };
 
+// Get all users
 const getAllUsers = () => {
     const query = 'SELECT * FROM users';
 
@@ -60,7 +64,7 @@ const getAllUsers = () => {
     });
 };
 
-
+// Delete a user
 const deleteUser = (userId) => {
     const query = 'DELETE FROM users WHERE id = ?';
 
@@ -75,7 +79,7 @@ const deleteUser = (userId) => {
     });
 };
 
-
+// Update a user
 const updateUser = (id, updatedData) => {
     const { email, password, name, profile_picture, role } = updatedData;
     const query = `

@@ -10,7 +10,10 @@ import {
 import { Link, Outlet } from 'react-router-dom';
 
 const Sidebar = ({ role }) => {
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Sidebar items based on user role
   const getSidebarItems = () => {
     switch (role) {
       case 'Admin':

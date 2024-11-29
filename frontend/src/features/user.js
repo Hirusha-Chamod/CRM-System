@@ -15,6 +15,7 @@ const handleApiError = (error) => {
     return error.response?.data?.message || error.message || 'An error occurred';
 };
 
+// Async Thunks
 export const loginUser = createAsyncThunk(
     'user/login',
     async (credentials, { rejectWithValue }) => {
@@ -88,6 +89,7 @@ const userSlice = createSlice({
     },
     extraReducers: (builder) => {
 
+        //Login 
         builder
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
@@ -103,7 +105,7 @@ const userSlice = createSlice({
                 state.error = payload;
             });
 
-
+        //Authentication Check
         builder
             .addCase(authCheck.pending, (state) => {
                 state.loading = true;

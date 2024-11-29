@@ -1,5 +1,6 @@
 const ticketService = require('../services/ticketsService');
 
+//CreateTicket Controller
 const createTicket = async (req, res) => {
     try {
 
@@ -40,6 +41,7 @@ const createTicket = async (req, res) => {
     }
 }
 
+//GetTicketById Controller
 const getTicketById = async (req, res) => {
     try {
 
@@ -60,16 +62,10 @@ const getTicketById = async (req, res) => {
 
     }
 }
+
+//GetTicketByUser Controller
 const getTicketByUser = async (req, res) => {
     try {
-        // // Validate user context
-        // if (!req.user || !req.user.id) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: "Invalid user context"
-        //     });
-        // }
-
         const userId = req.params.id;
 
         const tickets = await ticketService.getTicketByUser(userId);
@@ -98,7 +94,7 @@ const getTicketByUser = async (req, res) => {
 };
 
 
-
+//GetAllTickets Controller
 const getAllTickets = async (req, res) => {
     try {
 
@@ -118,6 +114,7 @@ const getAllTickets = async (req, res) => {
     }
 }
 
+//UpdateTicket Controller
 const updateTicket = async (req, res) => {
     try {
 
@@ -140,6 +137,7 @@ const updateTicket = async (req, res) => {
     }
 }
 
+//DeleteTicket Controller
 const deleteTicket = async (req, res) => {
     try {
 

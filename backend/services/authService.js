@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
-const generateToken = require('../utils/generateToken');  // Import the token generation utility
+const generateToken = require('../utils/generateToken');  
 const userModel = require('../models/user');
 
+//Register a new user
 const registerUser = async (userData) => {
     try {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -22,6 +23,7 @@ const registerUser = async (userData) => {
     }
 };
 
+//Login a user
 const loginUser = async (email, password) => {
     try {
         const user = await userModel.getUserByEmail(email);

@@ -11,11 +11,13 @@ const AdminRegister = () => {
 
     const { loading, error } = useSelector((state) => state.user);
 
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
     });
+
 
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState(null);
@@ -34,6 +36,7 @@ const AdminRegister = () => {
         }));
     };
 
+    //Form Validation
     const validateForm = () => {
         const newErrors = {};
 
@@ -58,6 +61,7 @@ const AdminRegister = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    //Register Admin
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitError(null);
@@ -78,11 +82,13 @@ const AdminRegister = () => {
                     email: '',
                     password: '',
                 });
+
                 notification.success({
                     message: 'Success',
                     description: 'Admin created successfully.',
                     duration: 3,
                 });
+
                 navigate('/login');
             } catch (err) {
                 const errorMessage = err || 'An unexpected error occurred';

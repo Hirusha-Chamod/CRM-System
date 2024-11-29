@@ -1,6 +1,7 @@
 const { query } = require('express');
 const db = require('../config/db');
 
+// Create a new ticket
 const createTicket = (ticketData) => {
 
     const { serial_number, client_name, client_address, client_contact_details, amount, created_by, assigned_to } = ticketData;
@@ -20,6 +21,7 @@ const createTicket = (ticketData) => {
     })
 }
 
+// Get a ticket by id
 const getTicketById = (id) => {
     const query = 'SELECT * FROM tickets WHERE id = ?';
 
@@ -34,6 +36,7 @@ const getTicketById = (id) => {
     })
 }
 
+// Get a ticket by user ID
 const getTicketByUser = (id) => {
     const query = 'SELECT * FROM tickets WHERE created_by = ? OR assigned_to = ? ORDER BY created_at DESC';
 
@@ -48,8 +51,9 @@ const getTicketByUser = (id) => {
     });
 };
 
+// Get all tickets
 const getAllTickets = () => {
-    const query = 'SELECT * FROM tickets';  // Use const or let here
+    const query = 'SELECT * FROM tickets';  
 
     return new Promise((resolve, reject) => {
         db.query(query, (err, result) => {
@@ -62,7 +66,7 @@ const getAllTickets = () => {
     })
 }
 
-// ticketModel.js
+// Update a ticket
 const updateTicket = (id, ticketData) => {
     const { client_name, client_address, client_contact_details, amount, assigned_to, status } = ticketData;
     const fieldsToUpdate = [];
@@ -90,7 +94,7 @@ const updateTicket = (id, ticketData) => {
     }
     if (status) {
         fieldsToUpdate.push("status = ?");
-        values.push(status); // Update status
+        values.push(status); 
     }
 
     values.push(id);

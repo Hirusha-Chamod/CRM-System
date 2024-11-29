@@ -10,6 +10,7 @@ export const TicketProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    //Fetch tickets
     const fetchTickets = useCallback(async (userId) => {
         setLoading(true);
         setError(null);
@@ -35,6 +36,7 @@ export const TicketProvider = ({ children }) => {
     }, []);
 
 
+    //Delete tickets
     const deleteTicket = async (ticketId) => {
         try {
 
@@ -48,6 +50,7 @@ export const TicketProvider = ({ children }) => {
         }
     }
 
+    //Update tickets
     const updateTicket = async (updatedTicket) => {
         setLoading(true);
         setError(null);

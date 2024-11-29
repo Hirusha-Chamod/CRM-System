@@ -4,14 +4,15 @@ const ENV_VARS = require('../config/envVars');
 
 const protectRoute = async (req, res, next) => {
     try {
-        // Extract token from Authorization header
+       
+        // Check if token is provided
         const authHeader = req.headers.authorization;
 
         if (!authHeader) {
             return res.status(401).json({ success: false, message: "Unauthorized - No Token Provided" });
         }
 
-        // Check if the header starts with 'Bearer '
+        // Check if token is valid
         const token = authHeader.startsWith('Bearer ')
             ? authHeader.split(' ')[1]
             : authHeader;
@@ -20,7 +21,7 @@ const protectRoute = async (req, res, next) => {
             return res.status(401).json({ success: false, message: "Unauthorized - Invalid Token Format" });
         }
 
-        
+        // Verify token
         const decoded = jwt.verify(token, ENV_VARS.JWT_SECRET);
 
         if (!decoded) {

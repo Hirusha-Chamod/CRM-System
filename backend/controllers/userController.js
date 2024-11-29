@@ -1,10 +1,11 @@
 const userService = require('../services/userService');
 
+//Update controller
 const updateUser = async (req, res) => {
     const userId = req.params.id;
     const updatedData = req.body;
 
-    // Basic validation
+    
     if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
     }
@@ -23,10 +24,11 @@ const updateUser = async (req, res) => {
     }
 };
 
+//Delete controller
 const deleteUser = async (req, res) => {
     const userId = req.params.id;
 
-    // Basic validation
+    
     if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
     }
@@ -44,7 +46,7 @@ const deleteUser = async (req, res) => {
     }
 };
 
-
+//Get all users controller
 const getAllUsers = async (req, res) => {
     try {
         const users = await userService.getAllUsers();
@@ -60,6 +62,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+//Get user by id controller
 const getUserById = async (req, res) => {
     try {
         const id = req.params.id;

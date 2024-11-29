@@ -5,10 +5,12 @@ import { LogOut, UserPlus, Users, TicketCheck, TicketPlus } from 'lucide-react';
 import { logoutUser } from '../features/user';
 
 const Homepage = () => {
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
 
+    // Logout user
     const handleLogout = async () => {
         const confirmation = window.confirm('Are you sure you want to log out?');
         if (confirmation) {

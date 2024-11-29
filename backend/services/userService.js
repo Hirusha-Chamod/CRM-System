@@ -2,6 +2,7 @@
 const userModel = require('../models/user');
 const bcrypt = require('bcrypt');
 
+// Update a user
 const updateUser = async (userId, updatedData) => {
     try {
         if (updatedData.password) {
@@ -16,7 +17,7 @@ const updateUser = async (userId, updatedData) => {
     }
 };
 
-
+// Delete a user
 const deleteUser = async (userId) => {
     try {
         const results = await userModel.deleteUser(userId);
@@ -26,6 +27,7 @@ const deleteUser = async (userId) => {
     }
 };
 
+// Get all users
 const getAllUsers = async () => {
     try {
         const users = await userModel.getAllUsers();
@@ -35,6 +37,7 @@ const getAllUsers = async () => {
     }
 };
 
+// Get a user by id
 const getUserById = async (id) => {
     try {
         const user = await userModel.getUserById(id);

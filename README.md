@@ -54,4 +54,11 @@ CREATE TABLE tickets (
 );
 
 ```
+## Setting Up the First Admin User
+
+## To create the first admin user,
+
+### Navigate to the Admin Registration Page
+After setting up the project, you can add the first admin user by navigating to:
+'yourUrl/admin/register'
 
